@@ -20,5 +20,5 @@ model User {
   senha_hash             String
   foto_perfil_url        String?
   createdAt              DateTime @default(now())
-  updatedAt              DateTime 
+  updatedAt              DateTime @updatedAt
 }
