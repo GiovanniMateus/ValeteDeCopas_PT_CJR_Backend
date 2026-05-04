@@ -20,7 +20,7 @@ export class AuthService {
       throw new UnauthorizedException('Email ou senha inválidos');
     }
 
-    const senhaCorreta = await bcrypt.compare(loginDto.senha, user.senha_hash);
+    const senhaCorreta = await bcrypt.compare(loginDto.senha, user.senhaHash);
 
     if (!senhaCorreta) {
       throw new UnauthorizedException('Email ou senha inválidos');

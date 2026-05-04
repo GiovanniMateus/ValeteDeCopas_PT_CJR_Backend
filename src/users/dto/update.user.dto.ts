@@ -16,7 +16,7 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   @MinLength(6)
-  senha_hash?: string;
+  senhaHash?: string;
 
   @IsOptional()
   @IsString()
