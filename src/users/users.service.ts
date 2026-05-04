@@ -10,16 +10,16 @@ export class UsersService {
   constructor (private prisma : PrismaService){}
 
   async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(createUserDto.senha_hash, 10);
+    const hashedPassword = await bcrypt.hash(createUserDto.senhaHash, 10);
 
     const user = await this.prisma.user.create({
       data: {
         ...createUserDto,
-        senha_hash: hashedPassword,
+        senhaHash: hashedPassword,
       },
     });
 
-    const{senha_hash, ...userWithoutPassword}= user;
+    const{senhaHash, ...userWithoutPassword}= user;
     return userWithoutPassword;
   }
 
@@ -30,7 +30,7 @@ export class UsersService {
         username: true,
         nome: true,
         email: true,
-        foto_perfil_url: true,
+        fotoPerfilUrl: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -48,8 +48,8 @@ export class UsersService {
       throw new Error('User não encontrado');
     }
 
-    if (data.senha_hash) {
-      data.senha_hash = await bcrypt.hash(data.senha_hash, 10);
+    if (data.senhaHash) {
+      data.senhaHash = await bcrypt.hash(data.senhaHash, 10);
     }
 
     return await this.prisma.user.update({
@@ -62,7 +62,7 @@ export class UsersService {
         username: true,
         nome: true,
         email: true,
-        foto_perfil_url: true,
+        fotoPerfilUrl: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -96,7 +96,7 @@ export class UsersService {
         username: true,
         nome: true,
         email: true,
-        foto_perfil_url: true,
+        fotoPerfilUrl: true,
         createdAt: true,
         updatedAt: true,
       },
