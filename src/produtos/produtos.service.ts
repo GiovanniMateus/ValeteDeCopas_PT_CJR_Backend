@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class ProdutosService {
@@ -39,9 +40,26 @@ export class ProdutosService {
     });
 
     if (!produto) {
-      throw new Error('Produto não encontrado');
+      throw new NotFoundException('Produto não encontrado');
     }
 
     return produto;
   }
+
+  async delete(id:number){
+    await this.getById(id);
+
+    return await this.prisma.produto.delete({
+      where:{id},
+    });
+  }
+
+  async update(id:number, data: any){
+    await this.getById(id);
+
+    return await this.prisma.produto.update({
+      where: {id},
+      data,
+    });
+  }  
 }
