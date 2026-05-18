@@ -1,17 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
-import { NotFoundError } from 'rxjs';
+
+
 
 @Injectable()
 export class ProdutosService {
 
   constructor(private prisma: PrismaService) {}
 
+  //  metodo create reformulado para que seja possivel criar um produto sem passar ou passando a url das imagens
   async create(data: CreateProdutoDto) {
+    const{ imagens = [], ... dadosProduto } = data;
 
     return await this.prisma.produto.create({
-      data,
+      data:{
+        ...dadosProduto,
+        imagens:{
+          create: imagens.map((url,index ) =>({
+            urlImagem: url,
+            ordem : index + 1,
+          })),
+        }
+      }
     });
   }
 
