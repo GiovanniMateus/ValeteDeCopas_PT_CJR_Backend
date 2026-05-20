@@ -1,4 +1,5 @@
-import { IsInt, IsNumber, IsString } from "class-validator";
+import { IsArray, IsInt, IsNumber, IsOptional, IsString } from "class-validator";
+import { execArgv } from "process";
 
 export class CreateProdutoDto {
 
@@ -19,4 +20,10 @@ export class CreateProdutoDto {
 
   @IsInt()
   estoque!: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  imagens?: string[];
+
 }
