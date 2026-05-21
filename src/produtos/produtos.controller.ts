@@ -19,6 +19,21 @@ export class ProdutosController {
     return this.produtosService.findAll();
   }
 
+  @Get('melhores-avaliados')
+  async melhoresAvaliados() {
+    return this.produtosService.melhoresAvaliados();
+  }
+
+  @Get('mais-baratos')
+  async maisBaratos() {
+    return this.produtosService.maisBaratos();
+  }
+
+  @Get('recem-adicionados')
+  async recemAdicionados() {
+    return this.produtosService.recemAdicionados();
+  }
+
   @Get(':id')
   async getById(@Param('id') id: string) {
     return this.produtosService.getById(Number(id));
