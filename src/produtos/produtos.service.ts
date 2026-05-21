@@ -73,4 +73,51 @@ export class ProdutosService {
       data,
     });
   }  
+  
+  async melhoresAvaliados() {
+    return await this.prisma.produto.findMany({
+      orderBy: {
+        avaliacoes: {
+          _count: 'desc',
+        },
+      },
+      take: 10,
+
+      include: {
+        imagens: true,
+        loja: true,
+        categoria: true,
+      },
+    });
+  }
+
+  async maisBaratos() {
+    return await this.prisma.produto.findMany({
+      orderBy: {
+        preco: 'asc',
+      },
+      take: 10,
+
+      include: {
+        imagens: true,
+        loja: true,
+        categoria: true,
+      },
+    });
+  }
+
+  async recemAdicionados() {
+    return await this.prisma.produto.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 10,
+
+      include: {
+        imagens: true,
+        loja: true,
+        categoria: true,
+      },
+    });
+  }
 }
