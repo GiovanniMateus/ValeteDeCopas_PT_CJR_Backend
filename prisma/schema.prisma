@@ -48,18 +48,23 @@ model Loja {
 model Categoria {
   id              Int         @id @default(autoincrement())
   nome            String
-  categoriaPaiId  Int?
 
-  categoriaPai    Categoria?  @relation("CategoriaPai", fields: [categoriaPaiId], references: [id])
-  subcategorias   Categoria[] @relation("CategoriaPai")
-  produtos        Produto[]
+  subcategorias Subcategoria[]
   lojas           Loja[]
+}
+
+model Subcategoria{
+  id          Int       @id @default(autoincrement())
+  nome        String
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  produtos    Produto[]
 }
 
 model Produto {
   id          Int      @id @default(autoincrement())
   lojaId      Int
-  categoriaId Int
+  subcategoriaId Int
   nome        String
   descricao   String
   preco       Float
@@ -68,7 +73,7 @@ model Produto {
   updatedAt   DateTime @updatedAt
 
   loja        Loja     @relation(fields: [lojaId], references: [id])
-  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  subcategoria  Subcategoria  @relation(fields: [subcategoriaId], references: [id])
   imagens     ImagemProduto[]
   avaliacoes  AvaliacaoProduto[]
 }

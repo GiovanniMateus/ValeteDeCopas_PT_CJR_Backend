@@ -10,7 +10,7 @@ export class CategoriasService {
   async findAll() {
     return await this.prisma.categoria.findMany({
       select: {
-        id: true, nome: true, categoriaPaiId: true,},
+        id: true, nome: true,},
       orderBy: { nome: 'asc',},
     });
   }

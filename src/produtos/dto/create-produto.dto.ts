@@ -7,7 +7,7 @@ export class CreateProdutoDto {
   lojaId!: number;
 
   @IsInt()
-  categoriaId!: number;
+  subcategoriaId!: number;
 
   @IsString()
   nome!: string;
