@@ -45,7 +45,7 @@ export class ProdutosController {
 
     const dto: CreateProdutoDto = {
       lojaId: Number(body.lojaId),
-      subcategoriaId: Number(body.categoriaId),
+      subcategoriaId: Number(body.subcategoriaId),
       nome: body.nome,
       descricao: body.descricao,
       preco: parseFloat(body.preco),
