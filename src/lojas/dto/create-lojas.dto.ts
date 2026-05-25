@@ -1,22 +1,29 @@
-import {IsInt, IsString} from "class-validator";
+import {IsInt, IsString, IsOptional} from "class-validator";
 
 export class CreateLojasDto {
     @IsInt()
     userId!: number;
 
+    @IsInt()
+    categoriaId!: number;
+
     @IsString()
     nome!: string;
 
+    
     @IsString()
     descricao!: string;
 
+    @IsOptional()
     @IsString()
-    logoUrl!: string;
+    logoUrl?: string;
 
+    @IsOptional()
     @IsString()
-    bannerUrl!: string;
+    bannerUrl?: string;
 
+    @IsOptional()
     @IsString()
-    stickerUrl!: string;
+    stickerUrl?: string;
 
 }
