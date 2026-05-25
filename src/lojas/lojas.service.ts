@@ -14,18 +14,28 @@ export class LojasService {
     }
 
     async findAll() {
-        return await this.prisma.loja.findMany();
+        return await this.prisma.loja.findMany({
+            include: {
+                categoria: true,
+            },
+        });
     }
 
     async getById(id: number) {
+
         const loja = await this.prisma.loja.findUnique({
             where: {
                 id,
             },
+            include: {
+                categoria: true,
+            },
         });
+
         if (!loja) {
             throw new Error("Loja not found");
         }
+
         return loja;
     }
 
