@@ -32,7 +32,7 @@ export class ProdutosService {
       include: {
         imagens: true,
         loja: true,
-        categoria: true,
+        subcategoria: true,
       },
     });
   }
@@ -46,7 +46,7 @@ export class ProdutosService {
       include: {
         imagens: true,
         loja: true,
-        categoria: true,
+        subcategoria: true,
       },
     });
 
@@ -86,7 +86,7 @@ export class ProdutosService {
       include: {
         imagens: true,
         loja: true,
-        categoria: true,
+        subcategoria: true,
       },
     });
   }
@@ -101,7 +101,7 @@ export class ProdutosService {
       include: {
         imagens: true,
         loja: true,
-        categoria: true,
+        subcategoria: true,
       },
     });
   }
@@ -116,7 +116,7 @@ export class ProdutosService {
       include: {
         imagens: true,
         loja: true,
-        categoria: true,
+        subcategoria: true,
       },
     });
   }
