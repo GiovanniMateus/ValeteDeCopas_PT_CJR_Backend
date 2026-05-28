@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Delete, Put, UploadedFiles, UseInterceptors, 
-  UseGuards, Req, BadRequestException, UnauthorizedException, Query } from '@nestjs/common'; // ✅ adicionado Query
+  UseGuards, Req, BadRequestException, UnauthorizedException, Query } from '@nestjs/common'; 
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -52,7 +52,7 @@ export class ProdutosController {
     return this.produtosService.create(dto);
   }
 
-  // adicionado ?categoriaId= opcional
+  
   @Get()
   async findAll(@Query('categoriaId') categoriaId?: string) {
     return this.produtosService.findAll(
@@ -60,7 +60,7 @@ export class ProdutosController {
     );
   }
 
-  //  adicionado ?categoriaId= opcional
+  
   @Get('melhores-avaliados')
   async melhoresAvaliados(@Query('categoriaId') categoriaId?: string) {
     return this.produtosService.melhoresAvaliados(
@@ -68,7 +68,7 @@ export class ProdutosController {
     );
   }
 
-  //  adicionado ?categoriaId= opcional
+  
   @Get('mais-baratos')
   async maisBaratos(@Query('categoriaId') categoriaId?: string) {
     return this.produtosService.maisBaratos(
@@ -76,7 +76,7 @@ export class ProdutosController {
     );
   }
 
-  //  adicionado ?categoriaId= opcional
+
   @Get('recem-adicionados')
   async recemAdicionados(@Query('categoriaId') categoriaId?: string) {
     return this.produtosService.recemAdicionados(

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Delete, UseInterceptors, 
   UploadedFiles, BadRequestException, UseGuards, Req,
-  UnauthorizedException, Query } from '@nestjs/common'; // ✅ adicionado Query
+  UnauthorizedException, Query } from '@nestjs/common'; 
 import { CreateLojasDto } from '../lojas/dto/create-lojas.dto';
 import { UpdateLojaDto } from './dto/update-lojas.dto';
 import { LojasService } from './lojas.service';
@@ -71,7 +71,7 @@ export class LojasController {
     return this.lojasService.create(lojaData as CreateLojasDto);
   }
 
-  //  adicionado ?categoriaId= e ?userId= opcionais
+ 
   @Get()
   async findAll(
     @Query('categoriaId') categoriaId?: string,

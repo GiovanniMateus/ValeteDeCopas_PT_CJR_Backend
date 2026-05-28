@@ -23,11 +23,11 @@ export class ProdutosService {
     });
   }
 
-  //  adicionado filtro opcional por categoriaId
+  
   async findAll(categoriaId?: number) {
     return await this.prisma.produto.findMany({
       where: categoriaId
-        ? { subcategoria: { categoriaId } } // produto → subcategoria → categoria
+        ? { subcategoria: { categoriaId } } 
         : undefined,
       include: {
         imagens: true,

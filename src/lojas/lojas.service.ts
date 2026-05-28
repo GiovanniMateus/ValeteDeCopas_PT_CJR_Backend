@@ -13,7 +13,7 @@ export class LojasService {
         });
     }
 
-    // adicionado filtros opcionais por categoriaId e userId
+
     async findAll(categoriaId?: number, userId?: number) {
         return await this.prisma.loja.findMany({
             where: {
