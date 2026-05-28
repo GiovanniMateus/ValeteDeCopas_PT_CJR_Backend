@@ -2,33 +2,33 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 
-
-
 @Injectable()
 export class ProdutosService {
 
   constructor(private prisma: PrismaService) {}
 
-  //  metodo create reformulado para que seja possivel criar um produto sem passar ou passando a url das imagens
   async create(data: CreateProdutoDto) {
-    const{ imagens = [], ... dadosProduto } = data;
+    const{ imagens = [], ...dadosProduto } = data;
 
     return await this.prisma.produto.create({
       data:{
         ...dadosProduto,
         imagens:{
-          create: imagens.map((url,index ) =>({
+          create: imagens.map((url, index) =>({
             urlImagem: url,
-            ordem : index + 1,
+            ordem: index + 1,
           })),
         }
       }
     });
   }
 
-  async findAll() {
-
+  //  adicionado filtro opcional por categoriaId
+  async findAll(categoriaId?: number) {
     return await this.prisma.produto.findMany({
+      where: categoriaId
+        ? { subcategoria: { categoriaId } } // produto → subcategoria → categoria
+        : undefined,
       include: {
         imagens: true,
         loja: true,
@@ -38,11 +38,8 @@ export class ProdutosService {
   }
 
   async getById(id: number) {
-
     const produto = await this.prisma.produto.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         imagens: true,
         loja: true,
@@ -57,67 +54,48 @@ export class ProdutosService {
     return produto;
   }
 
-  async delete(id:number){
+  async delete(id: number) {
     await this.getById(id);
-
-    return await this.prisma.produto.delete({
-      where:{id},
-    });
+    return await this.prisma.produto.delete({ where: { id } });
   }
 
-  async update(id:number, data: any){
+  async update(id: number, data: any) {
     await this.getById(id);
+    return await this.prisma.produto.update({ where: { id }, data });
+  }
 
-    return await this.prisma.produto.update({
-      where: {id},
-      data,
-    });
-  }  
-  
-  async melhoresAvaliados() {
+  async melhoresAvaliados(categoriaId?: number) {
     return await this.prisma.produto.findMany({
+      where: categoriaId
+        ? { subcategoria: { categoriaId } }
+        : undefined,
       orderBy: {
-        avaliacoes: {
-          _count: 'desc',
-        },
+        avaliacoes: { _count: 'desc' },
       },
       take: 10,
-
-      include: {
-        imagens: true,
-        loja: true,
-        subcategoria: true,
-      },
+      include: { imagens: true, loja: true, subcategoria: true },
     });
   }
 
-  async maisBaratos() {
+  async maisBaratos(categoriaId?: number) {
     return await this.prisma.produto.findMany({
-      orderBy: {
-        preco: 'asc',
-      },
+      where: categoriaId
+        ? { subcategoria: { categoriaId } }
+        : undefined,
+      orderBy: { preco: 'asc' },
       take: 10,
-
-      include: {
-        imagens: true,
-        loja: true,
-        subcategoria: true,
-      },
+      include: { imagens: true, loja: true, subcategoria: true },
     });
   }
 
-  async recemAdicionados() {
+  async recemAdicionados(categoriaId?: number) {
     return await this.prisma.produto.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
+      where: categoriaId
+        ? { subcategoria: { categoriaId } }
+        : undefined,
+      orderBy: { createdAt: 'desc' },
       take: 10,
-
-      include: {
-        imagens: true,
-        loja: true,
-        subcategoria: true,
-      },
+      include: { imagens: true, loja: true, subcategoria: true },
     });
   }
 }
