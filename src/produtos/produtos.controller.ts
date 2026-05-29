@@ -1,13 +1,11 @@
 import { Body, Controller, Get, Param, Post, Delete, Put, UploadedFiles, UseInterceptors, 
-  UseGuards,Req,BadRequestException, UnauthorizedException} from '@nestjs/common';
+  UseGuards, Req, BadRequestException, UnauthorizedException, Query } from '@nestjs/common'; 
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import {diskStorage} from 'multer';
+import { diskStorage } from 'multer';
 import { extname } from 'path';
-
-
 
 @Controller('produtos')
 export class ProdutosController {
@@ -16,11 +14,11 @@ export class ProdutosController {
     private readonly produtosService: ProdutosService
   ) {}
 
- @Post()
-  @UseGuards(JwtAuthGuard) 
+  @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FilesInterceptor('imagens', 4, {
     storage: diskStorage({
-      destination: './uploads/produtos', 
+      destination: './uploads/produtos',
       filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
@@ -32,11 +30,9 @@ export class ProdutosController {
     @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[]
   ) {
-
-    // verificando auth
-    const userId = (req as any).user?.id; 
-    if(!userId){
-      throw new UnauthorizedException("Usuário não está autenticado."); 
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      throw new UnauthorizedException("Usuário não está autenticado.");
     }
 
     if (!files || files.length === 0) {
@@ -50,32 +46,42 @@ export class ProdutosController {
       descricao: body.descricao,
       preco: parseFloat(body.preco),
       estoque: Number(body.estoque),
-      
       imagens: files.map(file => `/uploads/produtos/${file.filename}`)
     };
 
     return this.produtosService.create(dto);
   }
 
-
+  
   @Get()
-  async findAll() {
-    return this.produtosService.findAll();
+  async findAll(@Query('categoriaId') categoriaId?: string) {
+    return this.produtosService.findAll(
+      categoriaId ? Number(categoriaId) : undefined
+    );
   }
 
+  
   @Get('melhores-avaliados')
-  async melhoresAvaliados() {
-    return this.produtosService.melhoresAvaliados();
+  async melhoresAvaliados(@Query('categoriaId') categoriaId?: string) {
+    return this.produtosService.melhoresAvaliados(
+      categoriaId ? Number(categoriaId) : undefined
+    );
   }
 
+  
   @Get('mais-baratos')
-  async maisBaratos() {
-    return this.produtosService.maisBaratos();
+  async maisBaratos(@Query('categoriaId') categoriaId?: string) {
+    return this.produtosService.maisBaratos(
+      categoriaId ? Number(categoriaId) : undefined
+    );
   }
+
 
   @Get('recem-adicionados')
-  async recemAdicionados() {
-    return this.produtosService.recemAdicionados();
+  async recemAdicionados(@Query('categoriaId') categoriaId?: string) {
+    return this.produtosService.recemAdicionados(
+      categoriaId ? Number(categoriaId) : undefined
+    );
   }
 
   @Get(':id')
@@ -84,12 +90,12 @@ export class ProdutosController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id:string){
+  async delete(@Param('id') id: string) {
     return this.produtosService.delete(Number(id));
   }
 
   @Put(':id')
-  async update(@Param('id') id:string, @Body() data:any){
+  async update(@Param('id') id: string, @Body() data: any) {
     return this.produtosService.update(Number(id), data);
   }
 }

@@ -13,8 +13,13 @@ export class LojasService {
         });
     }
 
-    async findAll() {
+
+    async findAll(categoriaId?: number, userId?: number) {
         return await this.prisma.loja.findMany({
+            where: {
+                ...(categoriaId && { categoriaId }),
+                ...(userId && { userId }),
+            },
             include: {
                 categoria: true,
             },
@@ -22,11 +27,8 @@ export class LojasService {
     }
 
     async getById(id: number) {
-
         const loja = await this.prisma.loja.findUnique({
-            where: {
-                id,
-            },
+            where: { id },
             include: {
                 categoria: true,
             },
@@ -40,16 +42,15 @@ export class LojasService {
     }
 
     async update(id: number, data: UpdateLojaDto) {
-    return this.prisma.loja.update({
-        where: { id },
-        data,
-    });
+        return this.prisma.loja.update({
+            where: { id },
+            data,
+        });
     }
 
     async delete(id: number) {
-
-    return this.prisma.loja.delete({
-      where: { id },
-    });
-  }
+        return this.prisma.loja.delete({
+            where: { id },
+        });
+    }
 }
