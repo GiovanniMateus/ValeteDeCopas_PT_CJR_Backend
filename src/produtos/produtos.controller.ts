@@ -52,15 +52,21 @@ export class ProdutosController {
     return this.produtosService.create(dto);
   }
 
-  
-  @Get()
-  async findAll(@Query('categoriaId') categoriaId?: string) {
-    return this.produtosService.findAll(
-      categoriaId ? Number(categoriaId) : undefined
-    );
-  }
+@Get()
+async findAll(
+  @Query('categoriaId') categoriaId?: string, @Query('userId') userId?: string,
+  @Query('page') page?: string,@Query('size') size?: string,) {
 
-  
+  return this.produtosService.findAll(
+    categoriaId ? Number(categoriaId) : undefined,
+    userId ? Number(userId) : undefined,
+    page ? Number(page) : 1,
+    size ? Number(size) : 15,
+  );
+}
+
+
+
   @Get('melhores-avaliados')
   async melhoresAvaliados(@Query('categoriaId') categoriaId?: string) {
     return this.produtosService.melhoresAvaliados(
