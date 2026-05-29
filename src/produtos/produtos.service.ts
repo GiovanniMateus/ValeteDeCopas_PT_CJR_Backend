@@ -26,12 +26,14 @@ export class ProdutosService {
 
 
   
-  async findAll(categoriaId?: number, userId?: number, page = 1, size = 15) {
+  async findAll(categoriaId?: number, userId?: number,subcategoriaId?: number, page = 1, size = 15) {
   const skip = (page - 1) * size;
 
   const where: any = {};
   if (categoriaId) where.subcategoria = { categoriaId };
   if (userId) where.loja = { userId }; 
+
+  if (subcategoriaId) where.subcategoriaId = subcategoriaId;
 
   const [produtos, total] = await this.prisma.$transaction([
     this.prisma.produto.findMany({

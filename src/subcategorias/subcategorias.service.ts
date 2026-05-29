@@ -9,7 +9,7 @@ export class SubcategoriasService {
   async findAll() {
     return await this.prisma.subcategoria.findMany({
     select: {
-        id: true, nome: true,},
+        id: true, nome: true, categoriaId: true},
       orderBy: { nome: 'asc',},
     });
   }
