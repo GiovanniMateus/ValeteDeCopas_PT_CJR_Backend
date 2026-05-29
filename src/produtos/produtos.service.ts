@@ -33,33 +33,44 @@ export class ProdutosService {
 
   async findAll(
     search?: string,
-    categoriaId?: number
+    categoriaId?: number,
+    userId?: number,
+    subcategoriaId?: number,
+    ordenacao?: string,
+    page = 1,
+    size = 15,
   ) {
+    const skip = (page - 1) * size;
+    const where: any = {};
 
-    return await this.prisma.produto.findMany({
+    if (search) {
+      where.nome = { contains: search, mode: 'insensitive' };
+    }
+    if (categoriaId) where.subcategoria = { categoriaId };
+    if (userId) where.loja = { userId };
+    if (subcategoriaId) where.subcategoriaId = subcategoriaId;
 
-      where: {
+    let prismaOrderBy: any = { createdAt: 'desc' };
+    if (ordenacao === 'Menor preço') prismaOrderBy = { preco: 'asc' };
+    else if (ordenacao === 'Maior preço') prismaOrderBy = { preco: 'desc' };
 
-        ...(search && {
-          nome: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        }),
+    const [produtos, total] = await this.prisma.$transaction([
+      this.prisma.produto.findMany({
+        where,
+        include: { imagens: true, loja: true, subcategoria: true },
+        skip,
+        take: size,
+        orderBy: prismaOrderBy,
+      }),
+      this.prisma.produto.count({ where }),
+    ]);
 
-        ...(categoriaId && {
-          subcategoria: {
-            categoriaId,
-          },
-        }),
-      },
-
-      include: {
-        imagens: true,
-        loja: true,
-        subcategoria: true,
-      },
-    });
+    return {
+      content: produtos,
+      totalItems: total,
+      totalPages: Math.ceil(total / size),
+      page,
+    };
   }
 
   async getById(id: number) {

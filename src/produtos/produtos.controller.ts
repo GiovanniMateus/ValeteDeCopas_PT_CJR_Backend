@@ -86,11 +86,21 @@ export class ProdutosController {
   @Get()
   async findAll(
     @Query('search') search?: string,
-    @Query('categoriaId') categoriaId?: string
+    @Query('categoriaId') categoriaId?: string,
+    @Query('userId') userId?: string,
+    @Query('page') page?: string,
+    @Query('size') size?: string,
+    @Query('subcategoriaId') subcategoriaId?: string,
+    @Query('ordenacao') ordenacao?: string,
   ) {
     return this.produtosService.findAll(
       search,
-      categoriaId ? Number(categoriaId) : undefined
+      categoriaId ? Number(categoriaId) : undefined,
+      userId ? Number(userId) : undefined,
+      subcategoriaId ? Number(subcategoriaId) : undefined,
+      ordenacao,
+      page ? Number(page) : 1,
+      size ? Number(size) : 15,
     );
   }
 
