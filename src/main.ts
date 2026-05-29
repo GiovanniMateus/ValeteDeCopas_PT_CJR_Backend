@@ -15,9 +15,8 @@ async function bootstrap() {
 
 
   // a pasta uploads vai ficar aberta para que seus arquivos possam ser acessados
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/', 
-  });
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
+
 
   await app.listen(process.env.PORT ?? 3001);
 }
