@@ -1,3 +1,4 @@
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   Injectable,
   NotFoundException
@@ -168,4 +169,28 @@ export class ProdutosService {
       },
     });
   }
+
+
+   async getById(id: number) {
+    if (!id || isNaN(id)) {
+      throw new BadRequestException('ID inválido');
+     }
+
+    const produto = await this.prisma.produto.findUnique({
+      where: { id },
+      include: {
+        imagens: true,
+        loja: true,
+        subcategoria: true,
+      },
+    });
+
+    if (!produto) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
+    return produto;
+
+  }
+
 }
