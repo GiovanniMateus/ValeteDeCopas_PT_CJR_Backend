@@ -1,9 +1,25 @@
-import { Body, Controller, Get, Param, Post, Delete, Put, UploadedFiles, UseInterceptors, 
-  UseGuards, Req, BadRequestException, UnauthorizedException, Query } from '@nestjs/common'; 
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Delete,
+  Put,
+  UploadedFiles,
+  UseInterceptors,
+  UseGuards,
+  Req,
+  BadRequestException,
+  UnauthorizedException,
+  Query
+} from '@nestjs/common';
+
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
@@ -16,27 +32,40 @@ export class ProdutosController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FilesInterceptor('imagens', 4, {
-    storage: diskStorage({
-      destination: './uploads/produtos',
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
-      }
+  @UseInterceptors(
+    FilesInterceptor('imagens', 4, {
+      storage: diskStorage({
+        destination: './uploads/produtos',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+
+          cb(
+            null,
+            `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`
+          );
+        }
+      })
     })
-  }))
+  )
   async create(
     @Req() req: Request,
     @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[]
   ) {
+
     const userId = (req as any).user?.id;
+
     if (!userId) {
-      throw new UnauthorizedException("Usuário não está autenticado.");
+      throw new UnauthorizedException(
+        'Usuário não está autenticado.'
+      );
     }
 
     if (!files || files.length === 0) {
-      throw new BadRequestException('É obrigatório enviar pelo menos uma imagem do produto.');
+      throw new BadRequestException(
+        'É obrigatório enviar pelo menos uma imagem do produto.'
+      );
     }
 
     const dto: CreateProdutoDto = {
@@ -46,54 +75,48 @@ export class ProdutosController {
       descricao: body.descricao,
       preco: parseFloat(body.preco),
       estoque: Number(body.estoque),
-      imagens: files.map(file => `/uploads/produtos/${file.filename}`)
+      imagens: files.map(
+        file => `/uploads/produtos/${file.filename}`
+      )
     };
 
     return this.produtosService.create(dto);
   }
 
-@Get()
-async findAll(
-  @Query('categoriaId') categoriaId?: string, 
-  @Query('userId') userId?: string,
-  @Query('page') page?: string,
-   @Query('size') size?: string,
-  @Query('subcategoriaId') subcategoriaId?: string,
-  @Query('ordenacao') ordenacao?: string,) {
-
-  return this.produtosService.findAll(
-    categoriaId ? Number(categoriaId) : undefined,
-    userId ? Number(userId) : undefined,
-    subcategoriaId ? Number(subcategoriaId) : undefined, 
-    ordenacao,
-    page ? Number(page) : 1,
-    size ? Number(size) : 15,
-  );
-}
-
-
+  @Get()
+  async findAll(
+    @Query('search') search?: string,
+    @Query('categoriaId') categoriaId?: string,
+    @Query('userId') userId?: string,
+    @Query('page') page?: string,
+    @Query('size') size?: string,
+    @Query('subcategoriaId') subcategoriaId?: string,
+    @Query('ordenacao') ordenacao?: string,
+  ) {
+    return this.produtosService.findAll(
+      search,
+      categoriaId ? Number(categoriaId) : undefined,
+      userId ? Number(userId) : undefined,
+      subcategoriaId ? Number(subcategoriaId) : undefined,
+      ordenacao,
+      page ? Number(page) : 1,
+      size ? Number(size) : 15,
+    );
+  }
 
   @Get('melhores-avaliados')
-  async melhoresAvaliados(@Query('categoriaId') categoriaId?: string) {
-    return this.produtosService.melhoresAvaliados(
-      categoriaId ? Number(categoriaId) : undefined
-    );
+  async melhoresAvaliados() {
+    return this.produtosService.melhoresAvaliados();
   }
 
-  
   @Get('mais-baratos')
-  async maisBaratos(@Query('categoriaId') categoriaId?: string) {
-    return this.produtosService.maisBaratos(
-      categoriaId ? Number(categoriaId) : undefined
-    );
+  async maisBaratos() {
+    return this.produtosService.maisBaratos();
   }
-
 
   @Get('recem-adicionados')
-  async recemAdicionados(@Query('categoriaId') categoriaId?: string) {
-    return this.produtosService.recemAdicionados(
-      categoriaId ? Number(categoriaId) : undefined
-    );
+  async recemAdicionados() {
+    return this.produtosService.recemAdicionados();
   }
 
   @Get(':id')
@@ -107,7 +130,13 @@ async findAll(
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: any) {
-    return this.produtosService.update(Number(id), data);
+  async update(
+    @Param('id') id: string,
+    @Body() data: any
+  ) {
+    return this.produtosService.update(
+      Number(id),
+      data
+    );
   }
 }

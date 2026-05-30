@@ -1,51 +1,59 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+
 import { PrismaService } from '../database/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 
 @Injectable()
 export class ProdutosService {
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService
+  ) {}
 
   async create(data: CreateProdutoDto) {
-    const{ imagens = [], ...dadosProduto } = data;
+
+    const { imagens = [], ...dadosProduto } = data;
 
     return await this.prisma.produto.create({
-      data:{
+      data: {
         ...dadosProduto,
-        imagens:{
-          create: imagens.map((url, index) =>({
+
+        imagens: {
+          create: imagens.map((url, index) => ({
             urlImagem: url,
             ordem: index + 1,
           })),
-        }
-      }
+        },
+      },
     });
   }
 
-
-
-  
-  async findAll(categoriaId?: number, userId?: number,subcategoriaId?: number,
-  ordenacao?: string, page = 1, size = 15) {
-
+  async findAll(
+    search?: string,
+    categoriaId?: number,
+    userId?: number,
+    subcategoriaId?: number,
+    ordenacao?: string,
+    page = 1,
+    size = 15,
+  ) {
     const skip = (page - 1) * size;
-
     const where: any = {};
-    if (categoriaId) where.subcategoria = { categoriaId };
-    if (userId) where.loja = { userId }; 
 
+    if (search) {
+      where.nome = { contains: search, mode: 'insensitive' };
+    }
+    if (categoriaId) where.subcategoria = { categoriaId };
+    if (userId) where.loja = { userId };
     if (subcategoriaId) where.subcategoriaId = subcategoriaId;
 
-
     let prismaOrderBy: any = { createdAt: 'desc' };
-
-    if (ordenacao === 'Menor preço') {
-      prismaOrderBy = { preco: 'asc' };
-     }   
-    else if (ordenacao === 'Maior preço') {
-      prismaOrderBy = { preco: 'desc' }; 
-    }
+    if (ordenacao === 'Menor preço') prismaOrderBy = { preco: 'asc' };
+    else if (ordenacao === 'Maior preço') prismaOrderBy = { preco: 'desc' };
 
     const [produtos, total] = await this.prisma.$transaction([
       this.prisma.produto.findMany({
@@ -66,50 +74,99 @@ export class ProdutosService {
     };
   }
 
- 
+  async getById(id: number) {
+
+    const produto = await this.prisma.produto.findUnique({
+      where: { id },
+
+      include: {
+        imagens: true,
+        loja: true,
+        subcategoria: true,
+      },
+    });
+
+    if (!produto) {
+      throw new NotFoundException(
+        'Produto não encontrado'
+      );
+    }
+
+    return produto;
+  }
 
   async delete(id: number) {
+
     await this.getById(id);
-    return await this.prisma.produto.delete({ where: { id } });
+
+    return await this.prisma.produto.delete({
+      where: { id },
+    });
   }
 
   async update(id: number, data: any) {
+
     await this.getById(id);
-    return await this.prisma.produto.update({ where: { id }, data });
+
+    return await this.prisma.produto.update({
+      where: { id },
+      data,
+    });
   }
 
-  async melhoresAvaliados(categoriaId?: number) {
+  async melhoresAvaliados() {
+
     return await this.prisma.produto.findMany({
-      where: categoriaId
-        ? { subcategoria: { categoriaId } }
-        : undefined,
+
       orderBy: {
-        avaliacoes: { _count: 'desc' },
+        avaliacoes: {
+          _count: 'desc',
+        },
       },
+
       take: 10,
-      include: { imagens: true, loja: true, subcategoria: true },
+
+      include: {
+        imagens: true,
+        loja: true,
+        subcategoria: true,
+      },
     });
   }
 
-  async maisBaratos(categoriaId?: number) {
+  async maisBaratos() {
+
     return await this.prisma.produto.findMany({
-      where: categoriaId
-        ? { subcategoria: { categoriaId } }
-        : undefined,
-      orderBy: { preco: 'asc' },
+
+      orderBy: {
+        preco: 'asc',
+      },
+
       take: 10,
-      include: { imagens: true, loja: true, subcategoria: true },
+
+      include: {
+        imagens: true,
+        loja: true,
+        subcategoria: true,
+      },
     });
   }
 
-  async recemAdicionados(categoriaId?: number) {
+  async recemAdicionados() {
+
     return await this.prisma.produto.findMany({
-      where: categoriaId
-        ? { subcategoria: { categoriaId } }
-        : undefined,
-      orderBy: { createdAt: 'desc' },
+
+      orderBy: {
+        createdAt: 'desc',
+      },
+
       take: 10,
-      include: { imagens: true, loja: true, subcategoria: true },
+
+      include: {
+        imagens: true,
+        loja: true,
+        subcategoria: true,
+      },
     });
   }
 
