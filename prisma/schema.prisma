@@ -30,15 +30,17 @@ model User {
 model Loja {
   id          Int      @id @default(autoincrement())
   userId      Int
+  categoriaId Int
   nome        String
-  descricao   String
-  logoUrl     String
-  bannerUrl   String
-  stickerUrl  String
+  descricao   String?
+  logoUrl     String?
+  bannerUrl   String?
+  stickerUrl  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   user        User     @relation(fields: [userId], references: [id])
+  categoria   Categoria @relation(fields: [categoriaId], references: [id]) 
   produtos    Produto[]
   avaliacoes  AvaliacaoLoja[]
 }
@@ -46,17 +48,23 @@ model Loja {
 model Categoria {
   id              Int         @id @default(autoincrement())
   nome            String
-  categoriaPaiId  Int?
 
-  categoriaPai    Categoria?  @relation("CategoriaPai", fields: [categoriaPaiId], references: [id])
-  subcategorias   Categoria[] @relation("CategoriaPai")
-  produtos        Produto[]
+  subcategorias Subcategoria[]
+  lojas           Loja[]
+}
+
+model Subcategoria{
+  id          Int       @id @default(autoincrement())
+  nome        String
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  produtos    Produto[]
 }
 
 model Produto {
   id          Int      @id @default(autoincrement())
   lojaId      Int
-  categoriaId Int
+  subcategoriaId Int
   nome        String
   descricao   String
   preco       Float
@@ -65,7 +73,7 @@ model Produto {
   updatedAt   DateTime @updatedAt
 
   loja        Loja     @relation(fields: [lojaId], references: [id])
-  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  subcategoria  Subcategoria  @relation(fields: [subcategoriaId], references: [id])
   imagens     ImagemProduto[]
   avaliacoes  AvaliacaoProduto[]
 }
