@@ -1,8 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+
 
 import { PrismaService } from '../database/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
@@ -74,26 +71,7 @@ export class ProdutosService {
     };
   }
 
-  async getById(id: number) {
 
-    const produto = await this.prisma.produto.findUnique({
-      where: { id },
-
-      include: {
-        imagens: true,
-        loja: true,
-        subcategoria: true,
-      },
-    });
-
-    if (!produto) {
-      throw new NotFoundException(
-        'Produto não encontrado'
-      );
-    }
-
-    return produto;
-  }
 
   async delete(id: number) {
 
