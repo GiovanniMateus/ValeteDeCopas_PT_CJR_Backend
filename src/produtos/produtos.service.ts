@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
-
 import { PrismaService } from '../database/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 
@@ -70,9 +69,6 @@ export class ProdutosService {
       page,
     };
   }
-
-
-
   async delete(id: number) {
 
     await this.getById(id);
