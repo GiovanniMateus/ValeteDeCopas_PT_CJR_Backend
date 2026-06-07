@@ -16,7 +16,7 @@ export class CreateUserDto {
 
     @IsOptional()
     @IsString()
-    foto_perfil_url?: string;
+    fotoPerfilUrl?: string;
 }
 
 
