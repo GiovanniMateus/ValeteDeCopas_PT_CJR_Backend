@@ -36,6 +36,7 @@ export class ProdutosService {
     ordenacao?: string,
     page = 1,
     size = 15,
+    lojaId?: number,
   ) {
     const skip = (page - 1) * size;
     const where: any = {};
@@ -46,6 +47,7 @@ export class ProdutosService {
     if (categoriaId) where.subcategoria = { categoriaId };
     if (userId) where.loja = { userId };
     if (subcategoriaId) where.subcategoriaId = subcategoriaId;
+    if (lojaId) where.lojaId = lojaId;
 
     let prismaOrderBy: any = { createdAt: 'desc' };
     if (ordenacao === 'Menor preço') prismaOrderBy = { preco: 'asc' };

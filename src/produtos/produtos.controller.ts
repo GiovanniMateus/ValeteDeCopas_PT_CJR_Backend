@@ -92,6 +92,7 @@ export class ProdutosController {
     @Query('size') size?: string,
     @Query('subcategoriaId') subcategoriaId?: string,
     @Query('ordenacao') ordenacao?: string,
+    @Query('lojaId') lojaId?: string,
   ) {
     return this.produtosService.findAll(
       search,
@@ -101,6 +102,7 @@ export class ProdutosController {
       ordenacao,
       page ? Number(page) : 1,
       size ? Number(size) : 15,
+      lojaId ? Number(lojaId) : undefined,
     );
   }
 
