@@ -36,6 +36,7 @@ export class AvaliacaoLojaController {
   async findByLoja(
     @Param('lojaId') lojaId: string
   ) {
+    console.log('lojaId recebido:', lojaId);
     return this.avaliacaoLojaService.findByLoja(
       Number(lojaId)
     );
