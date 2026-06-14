@@ -3,6 +3,10 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../database/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 
+
+import { unlink } from 'fs/promises';
+import { join } from 'path';
+
 @Injectable()
 export class ProdutosService {
 
@@ -71,14 +75,54 @@ export class ProdutosService {
       page,
     };
   }
+  
+
   async delete(id: number) {
-
-    await this.getById(id);
-
-    return await this.prisma.produto.delete({
+   
+    const produto = await this.prisma.produto.findUnique({
       where: { id },
+      include: { imagens: true }
+    });
+
+    if (!produto) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
+    if (produto.imagens && produto.imagens.length > 0) {
+      for (const imagem of produto.imagens) {
+        try {
+         // busca pelo nome da imagem
+          const nomeArquivo = imagem.urlImagem.replace('/uploads/', ''); 
+          
+    
+          const caminhoFisico = join(process.cwd(), 'uploads', nomeArquivo);
+          
+          // unlink apaga a imagem salva na passta uploads
+          await unlink(caminhoFisico);
+          
+        } catch (error) {
+          console.warn(`[Aviso] Arquivo físico não encontrado ou erro ao deletar: ${imagem.urlImagem}`);
+        }
+      }
+    }
+
+    
+    return await this.prisma.$transaction(async (tx) => {
+      
+      
+      await tx.imagemProduto.deleteMany({
+        where: { produtoId: id },
+      });
+
+      
+      return await tx.produto.delete({
+        where: { id },
+      });
+      
     });
   }
+
+  
 
   async update(id: number, data: any) {
 
