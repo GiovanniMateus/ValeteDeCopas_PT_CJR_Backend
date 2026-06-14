@@ -92,10 +92,10 @@ export class ProdutosService {
       for (const imagem of produto.imagens) {
         try {
          // busca pelo nome da imagem
-          const nomeArquivo = imagem.urlImagem.replace('/uploads/', ''); 
+          const nomeArquivo = imagem.urlImagem.replace('/uploads/produtos/', ''); 
           
     
-          const caminhoFisico = join(process.cwd(), 'uploads', nomeArquivo);
+          const caminhoFisico = join(process.cwd(), 'uploads/produtos', nomeArquivo);
           
           // unlink apaga a imagem salva na passta uploads
           await unlink(caminhoFisico);
@@ -122,15 +122,52 @@ export class ProdutosService {
     });
   }
 
-  
 
-  async update(id: number, data: any) {
 
+  // uptade atualizado para incluir imagens
+  async update(id: number, data: any, novasImagensUrls: string[] = []) {
+    
     await this.getById(id);
+
+  
+    const updateData: any = {};
+
+    if (data.nome) updateData.nome = data.nome;
+    if (data.descricao) updateData.descricao = data.descricao;
+    
+
+    if (data.preco) {
+      updateData.preco = parseFloat(data.preco);
+    }
+    if (data.estoque) {
+      updateData.estoque = parseInt(data.estoque, 10);
+    }
+    if (data.subcategoriaId) {
+      updateData.subcategoriaId = parseInt(data.subcategoriaId, 10);
+    }
+    if (data.lojaId) {
+      updateData.lojaId = parseInt(data.lojaId, 10);
+    }
+
+    // 
+    if (novasImagensUrls.length > 0) {
+      updateData.imagens = {
+        create: novasImagensUrls.map((url, index) => ({
+          urlImagem: url,
+          ordem: index + 1, 
+        })),
+      };
+    }
+
+    
+    if (Object.keys(updateData).length === 0) {
+      throw new BadRequestException('Nenhum dado válido fornecido para atualização.');
+    }
+
 
     return await this.prisma.produto.update({
       where: { id },
-      data,
+      data: updateData,
     });
   }
 
