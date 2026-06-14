@@ -148,25 +148,46 @@ export class ProdutosService {
 
 
    async getById(id: number) {
-    if (!id || isNaN(id)) {
-      throw new BadRequestException('ID inválido');
-     }
-
-    const produto = await this.prisma.produto.findUnique({
-      where: { id },
-      include: {
-        imagens: true,
-        loja: true,
-        subcategoria: true,
-      },
-    });
-
-    if (!produto) {
-      throw new NotFoundException('Produto não encontrado');
-    }
-
-    return produto;
-
+  if (!id || isNaN(id)) {
+    throw new BadRequestException('ID inválido');
   }
+
+  const produto = await this.prisma.produto.findUnique({
+    where: { id },
+    include: {
+      imagens: true,
+      loja: true,
+      subcategoria: true,
+      avaliacoes: {           
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              fotoPerfilUrl: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!produto) {
+    throw new NotFoundException('Produto não encontrado');
+  }
+
+  
+  const media =
+    produto.avaliacoes.length > 0
+      ? produto.avaliacoes.reduce((acc, av) => acc + av.nota, 0) / produto.avaliacoes.length
+      : 0;
+
+  return {
+    ...produto,
+    mediaAvaliacoes: parseFloat(media.toFixed(1)),
+  };
+}
+
+  
 
 }
