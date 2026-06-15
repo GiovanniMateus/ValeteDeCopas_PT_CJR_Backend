@@ -19,14 +19,23 @@ export class AvaliacaoProdutoService {
   async create(dto: CreateAvaliacaoProdutoDto) {
 
     return await this.prisma.avaliacaoProduto.create({
-      data: dto,
-
+      data: {
+        nota: dto.nota,
+        comentario: dto.comentario,
+        user: {
+          connect: { id: dto.userId }
+        },
+        produto: {
+          connect: { id: dto.produtoId }
+        }
+      },
       include: {
         user: true,
         produto: true,
       },
     });
   }
+  
 
   async findAll() {
 
@@ -94,21 +103,15 @@ export class AvaliacaoProdutoService {
     return avaliacao;
   }
 
-  async update(
-    id: number,
-    dto: UpdateAvaliacaoProdutoDto
-  ) {
-
+  async update(id: number, dto: UpdateAvaliacaoProdutoDto) {
     await this.getById(id);
 
     return await this.prisma.avaliacaoProduto.update({
-
-      where: {
-        id,
+      where: { id },
+      data: {
+        nota: dto.nota,
+        comentario: dto.comentario
       },
-
-      data: dto,
-
       include: {
         user: true,
         produto: true,
