@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { CreateLojasDto } from "./dto/create-lojas.dto";
 import { UpdateLojaDto } from "./dto/update-lojas.dto";
+
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 
 import { unlink } from 'fs/promises'; 
 import { join } from 'path';
@@ -30,19 +31,23 @@ export class LojasService {
     }
 
     async getById(id: number) {
-        const loja = await this.prisma.loja.findUnique({
-            where: { id },
-            include: {
-                categoria: true,
-            },
-        });
-
-        if (!loja) {
-            throw new Error("Loja not found");
-        }
-
-        return loja;
+    if (!id || isNaN(id)) {
+        throw new BadRequestException('ID inválido');
     }
+
+    const loja = await this.prisma.loja.findUnique({
+        where: { id },
+        include: {
+            categoria: true,
+        },
+    });
+
+    if (!loja) {
+        throw new NotFoundException('Loja não encontrada');
+    }
+
+    return loja;
+}
 
     async update(id: number, data: UpdateLojaDto) {
         return this.prisma.loja.update({
