@@ -65,10 +65,10 @@ async function main() {
     prisma.categoria.create({ data: { nome: 'Casa' } }),
   ]);
 
-  console.log('✅ 8 categorias criadas.\n');
+  console.log(' 8 categorias criadas.\n');
 
 
-  console.log('📁 Criando subcategorias...');
+  console.log(' Criando subcategorias...');
 
   const [
     subHortifruti, subAcougue,
@@ -155,9 +155,9 @@ async function main() {
     }),
   ]);
 
-  console.log('✅ 7 usuários criados.\n');
+  console.log(' 7 usuários criados.\n');
 
-  console.log('🏪 Criando lojas...');
+  console.log(' Criando lojas...');
 
   const [lojaTechZone, lojaModaExpress, lojaGameVault, lojaCasaDecor, lojaBelezaVip, lojaMercadoBom] = await Promise.all([
     prisma.loja.create({
@@ -222,10 +222,10 @@ async function main() {
     }),
   ]);
 
-  console.log('✅ 6 lojas criadas.\n');
+  console.log(' 6 lojas criadas.\n');
 
 
-  console.log('📦 Criando produtos...');
+  console.log(' Criando produtos...');
 
   
   const [prodSamsungS24, prodIphone15Pro, prodDellXPS, prodSonyWH, prodAirPods, prodKindleOasis] = await Promise.all([
@@ -499,8 +499,7 @@ async function main() {
     }),
   ]);
 
-  // --- FARMÁCIA: sem loja dedicada — produtos da Beleza VIP (farmácia/higiene como extensão) ---
-  // Criamos uma loja Farmácia dedicada para o admin
+
   const lojaFarmaciaSaude = await prisma.loja.create({
     data: {
       userId: admin.id, categoriaId: catFarmacia.id,
@@ -671,9 +670,7 @@ async function main() {
 
   console.log(' Imagens adicionadas.\n');
 
-  // =========================================================================
-  // 7. AVALIAÇÕES DE PRODUTOS (seleção representativa)
-  // =========================================================================
+
   console.log(' Criando avaliações de produtos...');
 
   const avaliacoesProduto = await Promise.all([
@@ -779,10 +776,8 @@ async function main() {
 
   console.log(` ${avaliacoesProduto.length} avaliações de produtos criadas.\n`);
 
-  // =========================================================================
-  // 8. AVALIAÇÕES DE LOJAS
-  // =========================================================================
-  console.log('🏬 Criando avaliações de lojas...');
+
+  console.log(' Criando avaliações de lojas...');
 
   const avaliacoesLoja = await Promise.all([
     prisma.avaliacaoLoja.create({ data: { userId: rodrigo.id,  lojaId: lojaTechZone.id,         nota: 5, comentario: 'Produto antes do prazo, bem embalado e 100% original. Chat responde em minutos.' } }),
@@ -801,9 +796,7 @@ async function main() {
 
   console.log(` ${avaliacoesLoja.length} avaliações de lojas criadas.\n`);
 
-  // =========================================================================
-  // 9. COMENTÁRIOS NAS AVALIAÇÕES
-  // =========================================================================
+
   console.log(' Criando comentários...');
 
   const [
@@ -860,9 +853,7 @@ async function main() {
 
   console.log('17 comentários criados.\n');
 
-  // =========================================================================
-  // RESUMO
-  // =========================================================================
+  
   console.log('━'.repeat(60));
   console.log(' Seed concluído com sucesso!\n');
   console.log(' Resumo:');
@@ -888,7 +879,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Erro durante o seed:', e);
+    console.error(' Erro durante o seed:', e);
     process.exit(1);
   })
   .finally(async () => {
