@@ -48,7 +48,7 @@ Com o PostgreSQL rodando e o `.env` configurado, rode as migrations do Prisma pa
 npx prisma migrate dev
 ```
 
-Para gerar o Prisma Client (necessário sempre que o `schema.prisma` muda):
+Caso der erro dizendo que o PrismaClient não foi gerado, você pode rodar npx prisma generate para o TypeScript reconhecer os tipos do banco.
 
 ```bash
 npx prisma generate
