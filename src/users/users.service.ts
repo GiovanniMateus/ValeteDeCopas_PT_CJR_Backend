@@ -1,11 +1,79 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from '../database/prisma.service';
 import { UpdateUserDto } from './dto/update.user.dto';
+import { AlterarSenhaDto } from './dto/alterar-senha.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
+
+  async alterarSenha(
+    id: number,
+    dto: AlterarSenhaDto,
+  ) {
+
+  const user = 
+    await this.prisma.user.findUnique({
+      where: {id},
+    });
+
+  if (!user) {
+    throw new NotFoundException(
+      'Usuário não encontrado'
+    );
+  }
+
+  const senhaCorreta = 
+    await bcrypt.compare(
+      dto.senhaAtual,
+      user.senhaHash,
+    );
+
+  if (!senhaCorreta) {
+    throw new BadRequestException(
+      'Senha atual incorreta'
+    );
+  }
+
+  if (dto.novaSenha === dto.senhaAtual) {
+    throw new BadRequestException(
+      'A nova senha deve ser diferente da senha atual'
+    );
+  }
+
+  if (
+    dto.novaSenha !== dto.confirmarSenha
+  ) {
+    throw new BadRequestException(
+      'As senhas não coincidem'
+    );
+  }
+
+  const novaSenhaHash = 
+    await bcrypt.hash(
+      dto.novaSenha,
+      10,
+    );
+
+  await this.prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      senhaHash: novaSenhaHash,
+    },
+  });
+
+  return {
+    message: 'Senha alterada com sucesso',
+    };
+  }
 
   constructor (private prisma : PrismaService){}
 
@@ -38,25 +106,25 @@ export class UsersService {
     });
   }
 
-  async update(id: number, data: UpdateUserDto) {
-    const UserExists = await this.prisma.user.findUnique({
-      where: {
-        id,
-      }
-    });
+  async update(
+    id: number, 
+    data: UpdateUserDto
+  ) {
+
+    const UserExists = 
+      await this.prisma.user.findUnique({
+        where: {id},
+      });
+
     if (!UserExists){
-      throw new Error('User não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
-    if (data.senhaHash) {
-      data.senhaHash = await bcrypt.hash(data.senhaHash, 10);
-    }
+    delete data.senhaHash;
 
     return await this.prisma.user.update({
       data,
-      where: {
-        id,
-      },
+      where: {id},
       select: {
         id: true,
         username: true,
@@ -77,7 +145,7 @@ export class UsersService {
     });
 
     if (!UserExists){
-      throw new Error('User não encontrado, não foi possível deletar');
+      throw new NotFoundException('Usuário não encontrado, não foi possível deletar');
     }
     return await this.prisma.user.delete({
       where: {
@@ -102,14 +170,9 @@ export class UsersService {
       },
     });
     if (!UserExists){
-      throw new Error('User não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
     return UserExists;
 
   }
-
-
-
-
 }
-

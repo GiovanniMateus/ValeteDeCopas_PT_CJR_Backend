@@ -8,6 +8,9 @@ import { ProdutosModule } from './produtos/produtos.module';
 import { CategoriasModule } from './categorias/categorias.module';
 import { LojasModule } from './lojas/lojas.module';
 import { SubcategoriasModule } from './subcategorias/subcategorias.module';
+import { AvaliacaoLojaModule } from './avaliacao-loja/avaliacao-loja.module';
+import { ComentariosModule } from './comentario/comentario.module';
+import { AvaliacaoProdutoModule } from './avaliacao-produto/avaliacao-produto.module';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { SubcategoriasModule } from './subcategorias/subcategorias.module';
     CategoriasModule,
     LojasModule,
     SubcategoriasModule,
+    AvaliacaoLojaModule,
+    ComentariosModule,
+    AvaliacaoProdutoModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -92,6 +92,7 @@ export class ProdutosController {
     @Query('size') size?: string,
     @Query('subcategoriaId') subcategoriaId?: string,
     @Query('ordenacao') ordenacao?: string,
+    @Query('lojaId') lojaId?: string,
   ) {
     return this.produtosService.findAll(
       search,
@@ -101,6 +102,7 @@ export class ProdutosController {
       ordenacao,
       page ? Number(page) : 1,
       size ? Number(size) : 15,
+      lojaId ? Number(lojaId) : undefined,
     );
   }
 
@@ -129,14 +131,46 @@ export class ProdutosController {
     return this.produtosService.delete(Number(id));
   }
 
+
   @Put(':id')
+  @UseInterceptors(
+  
+    FilesInterceptor('imagens', 4, {
+      storage: diskStorage({
+        destination: './uploads/produtos',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+
+          cb(
+            null,
+            `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`
+          );
+        }
+      })
+    })
+  )
+
+  
   async update(
     @Param('id') id: string,
-    @Body() data: any
+    @Body() data: any,
+    @UploadedFiles() files: Express.Multer.File[] //recebendo os arquivos
+
   ) {
+    
+    // extrai as urLs das novas imagens
+    const novasImagensUrls = files?.map(
+      file => `/uploads/produtos/${file.filename}`
+    ) || [];
+
+
     return this.produtosService.update(
       Number(id),
-      data
+      data,
+      novasImagensUrls
     );
   }
+
+
 }

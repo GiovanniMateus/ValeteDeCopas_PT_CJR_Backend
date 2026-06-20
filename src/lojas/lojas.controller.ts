@@ -88,14 +88,53 @@ export class LojasController {
     return this.lojasService.getById(Number(id));
   }
 
+
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'logo', maxCount: 1 },
+    { name: 'banner', maxCount: 1 },
+    { name: 'sticker', maxCount: 1 },
+  ], {
+    storage: diskStorage({
+      destination: './uploads/lojas',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
+      }
+    })
+  }))
+
+
   async update(
     @Param('id') id: string,
-    @Body() data: UpdateLojaDto
+    @Body() body: any,
+    @UploadedFiles() files: {
+      logo?: Express.Multer.File[],
+      banner?: Express.Multer.File[],
+      sticker?: Express.Multer.File[]
+    }
   ) {
-    return this.lojasService.update(Number(id), data);
+    const lojaData: any = {};
+    if (body.nome) lojaData.nome = body.nome;
+    if (body.categoriaId) lojaData.categoriaId = Number(body.categoriaId);
+    if (body.descricao) lojaData.descricao = body.descricao;
+
+    // se o user mandar novas imagens vai atualizar as existentes
+    if (files?.logo?.[0]) {
+      lojaData.logoUrl = `/uploads/lojas/${files.logo[0].filename}`;
+    }
+    if (files?.banner?.[0]) {
+      lojaData.bannerUrl = `/uploads/lojas/${files.banner[0].filename}`;
+    }
+    if (files?.sticker?.[0]) {
+      lojaData.stickerUrl = `/uploads/lojas/${files.sticker[0].filename}`;
+    }
+
+    return this.lojasService.update(Number(id), lojaData);
   }
 
+  
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.lojasService.delete(Number(id));
